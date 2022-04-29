@@ -56,6 +56,7 @@
             :currentKey="item.key"
             :allDynamicAttrList="allDynamicAttrList"
             :searchText="searchText"
+            @reloadTabInfo="reloadTabInfo"
           />
         </div>
         <span
@@ -580,6 +581,29 @@ export default {
         //当前tab
         currentTabType: currentTab || this.activeTab,
       };
+    },
+    /**
+     * 重新加载指定tab的key的列表数据（不管是否要刷新指定的key，提醒数据都要重新加载）
+     * @param {String} reloadKeys 重新加载的key
+     */
+    reloadTabInfo(reloadKeys){
+      //重新加载所有tab的数量提醒等信息
+      this.initAllTabRemindInfo();
+      let reloadKeyArray = reloadKeys?reloadKeys.split(","):[];
+      if(reloadKeyArray.length==0){
+        return;
+      }
+      for (let index = 0; index < this.allTabList.length; index++) {
+        const item = this.allTabList[index];
+        const refObj = this.$refs["listmodule_" + item.key];
+        if(reloadKeyArray.indexOf(item.key)>-1&&refObj){
+          if (refObj instanceof Array) {
+            refObj[0].reloadCurrentTabList();
+          } else{
+            refObj.reloadCurrentTabList();
+          }
+        }
+      }
     },
     /**
      * 加载所有tab的后端查询数据
@@ -1497,6 +1521,9 @@ export default {
         let cssObject_color_main = {
           color: item.mainColor ? item.mainColor.hex8 : "",
         };
+        let cssObject_border_main = {
+          "border-color": item.mainColor ? item.mainColor.hex8 : "",
+        };
         let cssObject_background_main = {
           "background-color": item.mainColor ? item.mainColor.hex8 : "",
         };
@@ -1534,6 +1561,17 @@ export default {
             (this.moduleObject.packageid || "module_demo") +
             " .idm-diverse-list-module-box .idm-dlm-item-body .idm-diverse-list-module-row:hover",
           cssObject_background_minor
+        );
+        //layer的主题
+        IDM.setStyleToPageHead(
+          "." +
+            themeNamePrefix +
+            item.key +
+            " .itodotabslist-layer-skin .idm-layer-btn .idm-layer-btn0",
+          {
+            ...cssObject_border_main,
+            ...cssObject_background_main
+          }
         );
       }
     },

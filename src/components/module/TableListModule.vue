@@ -32,12 +32,7 @@
               <div
                 :key="findex"
                 :style="getFieldCustomFont(fobj, item)"
-                @click="
-                  commonEventFunHandle(fobj.clickCustomFunction, {
-                    configObject: fobj,
-                    itemObject: item,
-                  })
-                "
+                @click="commonClickOpenToDoHandle(fobj,item)"
               >
                 <!--使用图标配置模式-->
                 <template v-if="fobj.iconType == 'config'">

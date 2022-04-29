@@ -20,12 +20,7 @@
               :key="findex"
               v-if="fobj.dataFiledPosition == 'default'"
               :style="getFieldCustomFont(fobj, item)"
-              @click="
-                commonEventFunHandle(fobj.clickCustomFunction, {
-                  configObject: fobj,
-                  itemObject: item,
-                })
-              "
+              @click="commonClickOpenToDoHandle(fobj,item)"
             >
               <!--使用图标配置模式-->
               <template v-if="fobj.iconType == 'config'">
@@ -168,11 +163,7 @@
         <div
           v-if="propData.diverseHoverShow"
           class="idm-dlm-item-hover"
-          @click="
-            commonEventFunHandle(propData.diverseHoverClickCustomFunction, {
-              itemObject: item,
-            })
-          "
+          @click="diverseHoverClickHandle(item)"
         >
           <div class="idm-dlm-item-flex">
             <!-- <a-checkbox v-model="item.idm_checkbox_status" style="margin-right:10px"/> -->
@@ -185,12 +176,7 @@
                   fobj.dataFiledPosition == 'hoverHandle'
                 "
                 :style="getFieldCustomFont(fobj, item)"
-                @click="
-                  commonEventFunHandle(fobj.clickCustomFunction, {
-                    configObject: fobj,
-                    itemObject: item,
-                  })
-                "
+                @click="commonClickOpenToDoHandle(fobj,item)"
               >
                 <!--使用图标配置模式-->
                 <template v-if="fobj.iconType == 'config'">
@@ -338,12 +324,7 @@
                         :key="ffindex"
                         v-if="ffobj.dataFiledPosition == 'hoverField'"
                         :style="getFieldCustomFont(ffobj, item)"
-                        @click="
-                          commonEventFunHandle(ffobj.clickCustomFunction, {
-                            configObject: ffobj,
-                            itemObject: item,
-                          })
-                        "
+                        @click="commonClickOpenToDoHandle(ffobj,item)"
                       >
                         <!--使用图标选择固定图标模式-->
                         <svg
@@ -381,12 +362,7 @@
                       :key="ffindex"
                       v-if="ffobj.dataFiledPosition == 'hoverOpinion'"
                       :style="getFieldCustomFont(ffobj, item)"
-                      @click="
-                        commonEventFunHandle(ffobj.clickCustomFunction, {
-                          configObject: ffobj,
-                          itemObject: item,
-                        })
-                      "
+                      @click="commonClickOpenToDoHandle(ffobj,item)"
                     >
                       <!--使用图标选择固定图标模式-->
                       <svg
@@ -445,28 +421,6 @@
   </div>
 </template>
 <script>
-window.reconvert = function (ctx) {
-  var str = ctx.itemObject[ctx.configObject.dataFiled];
-  if (!str) {
-    return "";
-  }
-  str = str.replace(/(\\u)(\w{1,4})/gi, function ($0) {
-    return String.fromCharCode(
-      parseInt(escape($0).replace(/(%5Cu)(\w{1,4})/g, "$2"), 16)
-    );
-  });
-  str = str.replace(/(&#x)(\w{1,4});/gi, function ($0) {
-    return String.fromCharCode(
-      parseInt(escape($0).replace(/(%26%23x)(\w{1,4})(%3B)/g, "$2"), 16)
-    );
-  });
-  str = str.replace(/(&#)(\d{1,6});/gi, function ($0) {
-    return String.fromCharCode(
-      parseInt(escape($0).replace(/(%26%23)(\d{1,6})(%3B)/g, "$2"))
-    );
-  });
-  return "<b>" + str + "</b>";
-};
 //混入不同模板的公共代码
 import mixins from './mixin'
 export default {
