@@ -1928,9 +1928,10 @@ export default {
       display: none;
     }
   }
-  .ant-tabs-bar {
-    margin: 0;
+  .ant-tabs-bar,.ant-tabs-bottom .ant-tabs-bottom-bar {
+    margin: 0 !important;
   }
+  
   &.ant-tabs .ant-tabs-left-content {
     padding-left: 0px;
   }
