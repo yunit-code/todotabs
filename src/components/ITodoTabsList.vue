@@ -114,6 +114,26 @@
         </template>
       </div>
     </a-tabs>
+    <!--
+      组件内部容器
+      增加class="drag_container" 代表内部可存放组件容器 必选
+      增加idm-ctrl-inner 代表内部容器组件（可定义单独的属性，只支持定义一类的属性,一个组件内只包含一种） 可选
+      idm-ctrl-id：组件的id，这个必须不能为空
+      idm-container-index  组件的内部容器索引，不重复唯一且不变，必选，建议从1开始
+      idm-refresh-container：刷新容器所在的组件状态，如果要刷新，只需要此属性有变化即可刷新整个组件的状态
+    -->
+    <div
+      v-show="propData.showDragContainer && showDragContainer"
+      class="idm_itodotabslist_drag_container"
+      :style="{ left: propData.dragContainerX, top: propData.dragContainerY }"
+    >
+      <div
+        class="drag_container"
+        idm-ctrl-inner
+        :idm-ctrl-id="moduleObject.id"
+        idm-container-index="1"
+      ></div>
+    </div>
   </div>
 </template>
 
@@ -134,6 +154,9 @@ export default {
     return {
       moduleObject: {},
       propData: this.$root.propData.compositeAttr || {
+        dragContainerY: '8px',
+        dragContainerX: '60%',
+        showDragContainer: false,
         // headLine: '行政办公',
         headLineWidth: 100,
         size: 'default',
@@ -457,7 +480,8 @@ export default {
       //搜索框是否打开
       searchOpen: false,
       //组件的最外层高度
-      moduleHeight: 0
+      moduleHeight: 0,
+      showDragContainer: false
     };
   },
   props: {},
@@ -709,6 +733,7 @@ export default {
       //扩展按钮
       that.propData.extraBtnList &&
         that.propData.extraBtnList.forEach(item => (item.showStatus = item.showType == 'default'));
+      this.showDragContainer = this.propData.dragContainerShowType == 'default';
       that.extraBtnList = that.propData.extraBtnList;
       //首先判断tab是用哪种方式加载
       /**
@@ -807,6 +832,26 @@ export default {
                 }
               }
             });
+          if (
+            this.propData.dragContainerShowType == 'dynamic' &&
+            this.propData.dragContainerDynamicAttrKeyName == item.attrCode
+          ) {
+            if (this.propData.dragContainerDynamicCompareType == 'result') {
+              this.showDragContainer =
+                this.propData.dragContainerDynamicCompareResult == item.attrData;
+            } else if (this.propData.dragContainerDynamicCompareType == 'function') {
+              this.showDragContainer =
+                window[this.propData.dragContainerDataFunction[0].name] &&
+                window[this.propData.dragContainerDataFunction[0].name].call(this, {
+                  ...that.commonParam(),
+                  customParam: this.propData.dragContainerDataFunction[0].param,
+                  _this: that,
+                  activeKey: that.activeTab,
+                  allKey: that.allTabList,
+                  actionType: 'dynamicAttr'
+                });
+            }
+          }
         });
       }
       that.initAllTabRemindInfo();
@@ -852,6 +897,44 @@ export default {
               break;
           }
         });
+    },
+    /**
+     * 悬浮容器显示处理事件
+     */
+    dragContainerShowStatusHandle(actionType) {
+      if (this.propData.dragContainerShowType == 'default') {
+        return;
+      }
+      switch (this.propData.dragContainerShowType) {
+        case 'toggle':
+          //用当前选中的页签对象去执行表达式
+          if (
+            this.getExpressData(
+              'data',
+              this.propData.dragContainerDataFiled,
+              this.allTabList.find(item => item.key === this.activeTab) || {}
+            )
+          ) {
+            this.showDragContainer = true;
+          } else {
+            this.showDragContainer = false;
+          }
+          break;
+        case 'dynamic':
+          break;
+        case 'custom':
+          this.showDragContainer =
+            window[this.propData.dragContainerDataFunction[0].name] &&
+            window[this.propData.dragContainerDataFunction[0].name].call(this, {
+              ...this.commonParam(),
+              customParam: this.propData.dragContainerDataFunction[0].param,
+              _this: this,
+              activeKey: this.activeTab,
+              allKey: this.allTabList,
+              actionType
+            });
+          break;
+      }
     },
     /**
      * tab扩展按钮点击事件
@@ -925,6 +1008,8 @@ export default {
         }
       }
       that.activeTab = firstDefaultKey || firstKey;
+      this.extraBtnShowStatusHandle('defaultTab');
+      this.dragContainerShowStatusHandle('defaultTab');
       that.$nextTick(function() {
         that.resizeContentWrapperHeight();
       });
@@ -1559,7 +1644,7 @@ export default {
       let that = this;
       this.activeTab = key;
       this.extraBtnShowStatusHandle('changeTab');
-
+      this.dragContainerShowStatusHandle('changeTab');
       this.changeEventFunHandle('changeFunction');
     },
     /**
@@ -1999,6 +2084,11 @@ export default {
       color: #333333 !important;
     }
   }
+}
+.idm_itodotabslist_drag_container {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 //子组件通用样式
 
