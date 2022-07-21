@@ -835,7 +835,7 @@
           "desc": "当显示方式为“切换依据显示”的时候代表页签选项卡切换的时候会根据当前填写的依据字段来去匹配结果值，为true则显示，false则不显示，此处填写表达式，更多详细用法点击查看",
           "bindKey": "dragContainerDataFiled",
           "display": "@[dragContainerShowType=='toggle']",
-          "placeholder": "示例：moreUrl 或者 [0].showSetting"
+          "placeholder": "示例：moreUrl 或者 [0].showSetting 或者 key==1(页签tab标识，而非索引)"
         },
         {
           "type": "actionSelect",
